@@ -42,7 +42,7 @@ http://localhost:4000/api/analyze/EGTS.CA
 ## 📦 البيانات المطلوبة في .env
 
 ```
-DB_USER=sa
+DB_USER=your_username
 DB_PASSWORD=your_password
 DB_SERVER=localhost
 DB_PORT=1433
