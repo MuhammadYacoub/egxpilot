@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>محلل الأسهم الذكي</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <!-- bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <img src="images/logo.png" alt="Logo" class="logo" />
+
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+          <input
+            id="symbolInput"
+            type="text"
+            placeholder="اكتب رمز السهم (مثال: EGTS)"
+          />
+          <button class="button" onclick="analyzeStock()">تحليل</button>
+          <button onclick="addSymbolOnly()">📌 إضافة مباشرة بدون تحليل</button>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="result" id="resultBox" style="display: none"></div>
+
+    <script src="main.js"></script>
+  </body>
+</html>

@@ -2,7 +2,7 @@
   "name": "trade-agent",
   "version": "1.0.0",
   "main": "index.js",
-   "scripts": {
+  "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "dev": "nodemon app.js",
@@ -12,8 +12,6 @@
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "format": "npm run prettier && npm run lint:fix"
-    
-
   },
   "keywords": [],
   "author": "Muhammad Yacoub",
@@ -25,6 +23,7 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "mssql": "^11.0.1",
+    "node-cron": "^4.0.7",
     "technicalindicators": "^3.1.0",
     "yahoo-finance2": "^2.13.3"
   },

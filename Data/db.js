@@ -1,27 +1,31 @@
-//Data/db.js
-// This file is responsible for connecting to the database
-const sql = require("mssql");
-require("dotenv").config();
+// /data/db.js
+require('dotenv').config();
+const sql = require('mssql');
 
-const config = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    server: process.env.DB_SERVER,
-    port: parseInt(process.env.DB_PORT),
-    database: process.env.DB_NAME,
-    options: {
-        encrypt: false,
-        trustServerCertificate: true
-    }
+const dbConfig = {
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  server: process.env.DB_SERVER,
+  port: parseInt(process.env.DB_PORT),
+  database: process.env.DB_NAME,
+  options: {
+    encrypt: false,
+    trustServerCertificate: true,
+  },
 };
 
-const pool = new sql.ConnectionPool(config);
-const poolConnect = pool.connect();
+const poolPromise = new sql.ConnectionPool(dbConfig)
+  .connect()
+  .then(pool => {
+    console.log('✔️ DB Connected from db.js');
+    return pool;
+  })
+  .catch(err => {
+    console.error('❌ DB Connection Failed:', err);
+    throw err;
+  });
 
-poolConnect.then(() => {
-    console.log('Database connection successful');
-}).catch(err => {
-    console.error('Database connection failed:', err);
-});
-
-module.exports = { sql, pool, poolConnect };
+module.exports = {
+  sql,
+  poolPromise
+};

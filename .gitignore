@@ -4,3 +4,6 @@ node_modules/
 *.log
 npm-debug.log*
 .env.*
+deprecated/
+.vscode/
+Notes.txt

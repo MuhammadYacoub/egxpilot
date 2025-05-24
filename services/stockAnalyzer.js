@@ -1,48 +1,48 @@
-// services/stockAnalyzer.js
-const yahooFinance = require('yahoo-finance2').default;
-const ti = require('technicalindicators');
+// stockAnalyzer.js - قراءة المؤشرات الفنية الجاهزة من قاعدة البيانات بدلاً من حسابها لحظيًا
+// هذا الملف الآن يعتمد على أن المؤشرات (RSI, MACD, SMA, EMA, Bollinger, إلخ) مخزنة مسبقًا في جدول PriceHistory أو جدول منفصل
 
-yahooFinance.suppressNotices(['ripHistorical']); // suppress warning
+const { poolPromise } = require("../data/db");
 
+// دالة لجلب آخر صف من PriceHistory مع المؤشرات الفنية المخزنة
+async function getLatestIndicators(symbol) {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input("symbol", symbol)
+      .query(`
+        SELECT TOP 1 * FROM PriceHistory
+        WHERE Symbol = @symbol
+        ORDER BY [PriceDate] DESC
+      `);
+    return result.recordset[0];
+  } catch (err) {
+    console.error("❌ فشل جلب المؤشرات من PriceHistory:", err);
+    return null;
+  }
+}
+
+// الدالة الرئيسية: تعيد المؤشرات الفنية الجاهزة والتوصية
 async function analyzeStock(symbol) {
   try {
-    const result = await yahooFinance.chart(symbol, {
-      period1: '2023-01-01',
-      interval: '1d'
-    });
+    // جلب آخر صف (أحدث يوم) من PriceHistory
+    const last = await getLatestIndicators(symbol);
+    if (!last) {
+      return { error: 'لا توجد بيانات كافية للتحليل', symbol };
+    }
 
-    const prices = result.quotes.map(d => d.close);
-    const volumes = result.quotes.map(d => d.volume);
-    const highs = result.quotes.map(d => d.high);
-    const lows = result.quotes.map(d => d.low);
+    // المؤشرات يجب أن تكون مخزنة في الأعمدة التالية (تأكد من وجودها في الجدول):
+    // RSI, MACD, MACDSignal, SMA20, EMA50, BB_Middle, BB_Upper, BB_Lower
+    const lastPrice = last.ClosePrice;
+    const lastRSI = last.RSI;
+    const lastMACD = { MACD: last.MACD, signal: last.MACDSignal, histogram: last.MACDHist };
+    const lastBB = { middle: last.BB_Middle, upper: last.BB_Upper, lower: last.BB_Lower };
+    const lastVolume = last.Volume;
+    const sma20 = last.SMA20;
+    const ema50 = last.EMA50;
 
-    const rsi = ti.RSI.calculate({ values: prices, period: 14 });
-    const macd = ti.MACD.calculate({
-      values: prices,
-      fastPeriod: 12,
-      slowPeriod: 26,
-      signalPeriod: 9,
-      SimpleMAOscillator: false,
-      SimpleMASignal: false,
-    });
-
-    const sma20 = ti.SMA.calculate({ values: prices, period: 20 });
-    const ema50 = ti.EMA.calculate({ values: prices, period: 50 });
-    const bb = ti.BollingerBands.calculate({
-      period: 20,
-      stdDev: 2,
-      values: prices,
-    });
-
-    const lastPrice = prices.at(-1);
-    const lastVolume = volumes.at(-1);
-    const lastRSI = rsi.at(-1);
-    const lastMACD = macd.at(-1);
-    const lastBB = bb.at(-1);
-
-    let suggestion = '🔍 تحليل فقط';
+    // منطق التوصية بناءً على المؤشرات
+    let suggestion = 'تحليل فقط';
     let confidence = 50;
-
     if (lastRSI < 30 && lastMACD?.MACD > lastMACD?.signal && lastPrice < lastBB.lower) {
       suggestion = '📈 فرصة شراء قوية';
       confidence = 90;
@@ -51,21 +51,22 @@ async function analyzeStock(symbol) {
       confidence = 70;
     }
 
+    // إرجاع النتائج النهائية
     return {
       symbol,
       lastPrice,
       rsi: lastRSI,
       macd: lastMACD,
-      sma20: sma20.at(-1),
-      ema50: ema50.at(-1),
+      sma20,
+      ema50,
       bollinger: lastBB,
       volume: lastVolume,
       suggestion,
       confidence,
     };
-  } catch (error) {
-    console.error('❌ تحليل السهم فشل:', symbol, error);
-    return { error: 'فشل التحليل', symbol };
+  } catch (err) {
+    console.error("❌ فشل التحليل الفني (قراءة من القاعدة):", err);
+    return { error: 'فشل التحليل الفني', symbol };
   }
 }
 

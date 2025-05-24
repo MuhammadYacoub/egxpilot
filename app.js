@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const analyzeStock = require('./services/stockAnalyzer');
-const db = require('./Data/db');
+const watchlistRoutes = require('./routes/watchlist');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -17,10 +17,6 @@ app.get('/', (req, res) => {
   res.send('📈 Stock Analyzer Running...');
 });
 
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-
 // تحليل سهم مباشر
 app.get(['/api/analyze/:symbol', '/api/analyze/:symbol/'], async (req, res) => {
   const symbol = req.params.symbol.toUpperCase().replace('/', '');
@@ -28,10 +24,7 @@ app.get(['/api/analyze/:symbol', '/api/analyze/:symbol/'], async (req, res) => {
   res.json(analysis);
 });
 
-// إضافة سهم إلى قائمة المراقبة
-const watchlistRoutes = require('./routes/watchlist');
+// 🆕 استخدام الراوتر الخارجي للمراقبة
 app.use('/api/watchlist', watchlistRoutes);
-
-
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
