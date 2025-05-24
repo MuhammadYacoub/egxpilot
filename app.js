@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 4000;
 
 // Middlewares
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static('docs'));
 
 // Root route
 app.get('/', (req, res) => {

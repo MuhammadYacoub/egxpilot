@@ -94,7 +94,7 @@ async function analyzeStock() {
     }
     box.style.display = 'block';
   } catch (err) {
-    box.innerHTML = `<p style='color:red;'>فشل في جلب البيانات</p>`;
+    box.innerHTML = `<p style='color:red;'>فشل في جلب البيانات.<br>تأكد أنك شغلت السيرفر (npm run dev أو npm start) وافتح الموقع عبر <b>http://localhost:PORT</b> وليس مباشرة من الملفات.<br><span style='font-size:13px;color:#888;'>${err.message || err}</span></p>`;
     box.style.display = 'block';
   }
 }
