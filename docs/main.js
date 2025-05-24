@@ -42,55 +42,66 @@ async function analyzeStock() {
     } else {
       // عرض النتائج بشكل منسق مع تفسيرات مختصرة
       box.innerHTML = `
-        <div class="result-header">
-          <h2>${data.symbol}${data.name ? ' - ' + data.name : ''}</h2>
-        </div>
-        <div class="result-body">
-          <div class="result-row">
-            <span class="result-label">🔹 السعر الحالي:</span>
-            <span class="result-value">${getPriceDescription(data.lastPrice)}</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">📉 RSI:</span>
-            <span class="result-value">${data.rsi?.toFixed(2) ?? 'غير متوفر'}</span>
-            <span class="result-label">تفسير:</span>
-            <span class="result-value">${getRsiDescription(data.rsi)}</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">📈 MACD:</span>
-            <span class="result-value">${data.macd?.MACD?.toFixed(2) ?? 'غير متوفر'}</span>
-            <span class="result-label">إشارة:</span>
-            <span class="result-value">${data.macd?.signal?.toFixed(2) ?? 'غير متوفر'}</span>
-            <span class="result-label">تفسير:</span>
-            <span class="result-value">${getMacdDescription(data.macd)}</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">📊 SMA 20:</span>
-            <span class="result-value">${data.sma20?.toFixed(2) ?? 'غير متوفر'}</span>
-            <span class="result-label">EMA 50:</span>
-            <span class="result-value">${data.ema50?.toFixed(2) ?? 'غير متوفر'}</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">📦 الحجم:</span>
-            <span class="result-value">${data.volume?.toLocaleString() ?? 'غير متوفر'}</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">📌 التوصية:</span>
-            <span class="result-badge ${data.suggestion === 'شراء' ? 'buy' : data.suggestion === 'بيع' ? 'sell' : 'hold'}">${data.suggestion}</span>
-          </div>
-          <div class='result-confidence'>
-            <span class="confidence-label">⚡ درجة الثقة:</span>
-            <div class="confidence-bar">
-              <div class="confidence-bar-inner" style="width: ${data.confidence}%;"></div>
-            </div>
-            <span class="confidence-label">${data.confidence}%</span>
-          </div>
-          <div class='actions'>
-            <button onclick="addToWatchlist('${data.symbol}')">📌 أضف للمراقبة</button>
-            <button onclick="alert('🚧 سيتم الحفظ كمملوك قريبًا')">✅ أضف كمملوك</button>
-          </div>
-        </div>
-      `;
+<div class="analysis-card">
+  <div class="card-header">
+    <h2><span id="stock-symbol">${data.symbol}</span>${data.name ? ' – <span id="stock-name">' + data.name + '</span>' : ''}</h2>
+    <span class="analysis-date">📅 تحليل بتاريخ: ${new Date(data.analyzedAt).toLocaleDateString("ar-EG")}</span>
+  </div>
+
+  <div class="card-price">
+    <span>💰 السعر الحالي:</span>
+    <strong>${data.lastPrice?.toFixed(2) ?? 'غير متوفر'} جنيه</strong>
+  </div>
+
+  <div class="core-insights">
+    <div><strong>📈 الاتجاه:</strong> ${data.trend}</div>
+    <div><strong>🔄 التقاطع:</strong> ${data.emaCross}</div>
+    <div><strong>📊 الزخم:</strong> ${data.momentumSignal}</div>
+    <div><strong>🔊 حجم التداول:</strong> ${data.volumeSpike ? "مرتفع" : "طبيعي"}</div>
+  </div>
+
+  <div class="levels">
+    <div>
+      <strong>🧱 مستويات الدعم:</strong>
+      ${data.supportLevels?.map(v => v.toFixed(2)).join(" / ") || "غير متوفر"}
+    </div>
+    <div>
+      <strong>🚧 مستويات المقاومة:</strong>
+      ${data.resistanceLevels?.map(v => v.toFixed(2)).join(" / ") || "غير متوفر"}
+    </div>
+  </div>
+
+  <div class="candles-theories">
+    <div><strong>🕯️ نمط الشمعة:</strong> ${data.candleSignal}</div>
+    <div><strong>📚 نظرية إليوت:</strong> ${data.elliottWave}</div>
+    <div><strong>📦 وايكوف:</strong> ${data.wyckoffPhase}</div>
+  </div>
+
+  <div class="confidence-score">
+    <strong>⚡ درجة الثقة:</strong>
+    <div class="confidence-bar">
+      <div class="confidence-bar-fill" style="width: ${data.score}%"></div>
+    </div>
+    <span class="confidence-percent">${data.score}%</span>
+  </div>
+
+  <div class="recommendation">
+    <strong>🔍 التوصية:</strong>
+    <span class="recommendation-badge">${data.recommendation}</span>
+  </div>
+
+  <div class="summary-section">
+    <h3>📄 الملخص الذكي:</h3>
+    <p>${data.summary}</p>
+  </div>
+
+  <div class="card-actions">
+    <button onclick="addToWatchlist('${data.symbol}')">📌 أضف للمراقبة</button>
+    <button onclick="alert('🚧 سيتم الحفظ كمملوك قريبًا')">✅ أضف كمملوك</button>
+  </div>
+</div>
+`;
+
     }
     box.style.display = 'block';
   } catch (err) {
@@ -155,27 +166,3 @@ async function addToWatchlist(symbol) {
   }
 }
 
-// إضافة سهم فقط (بدون تحليل مباشر) - يمكن استخدامها لاحقًا
-async function addSymbolOnly() {
-  const symbolInput = document.getElementById('symbolInput');
-  const baseSymbol = symbolInput.value.trim().toUpperCase().replace('.CA', '');
-  if (!baseSymbol) return alert('يرجى إدخال رمز السهم.');
-
-  const name = prompt('📌 أدخل اسم السهم (اختياري):', '');
-
-  try {
-    const res = await fetch('/api/watchlist/add', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ symbol: baseSymbol, name })
-    });
-    const data = await res.json();
-    if (data.success) {
-      alert('✅ تم الإضافة والتحليل بنجاح');
-    } else {
-      alert('❌ فشل الإضافة: ' + (data.error || 'خطأ غير معروف'));
-    }
-  } catch (err) {
-    alert('❌ فشل الاتصال بالسيرفر');
-  }
-}

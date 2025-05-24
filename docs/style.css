@@ -65,109 +65,140 @@ button:hover, button:focus, .button:hover, .button:focus {
   box-shadow: 0 4px 16px 0 #e0e0e0;
   border-color: #888;
 }
-.result {
-  margin-top: 2rem;
-  padding: 0;
+/* 🎯 تصميم كارت النتيجة التحليلي باللغة العربية */
+.analysis-card {
   background: #fff;
-  border-radius: 1.2rem;
-  width: 100%;
-  max-width: 600px;
-  box-shadow: 0 2px 12px rgba(60,60,60,0.10);
-  overflow: hidden;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 720px;
+  margin: 24px auto;
+  box-shadow: 0 0 15px rgba(0,0,0,0.08);
+  font-family: 'Cairo', 'Segoe UI', sans-serif;
   direction: rtl;
-}
-.result-header {
-  background: linear-gradient(90deg, #e3eafc 0%, #f5f6fa 100%);
-  padding: 1.2rem 1.5rem 0.7rem 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
   text-align: right;
+  color: #222;
+  line-height: 1.6;
 }
-.result-header h2 {
-  margin: 0;
-  color: #1976d2;
-  font-size: 1.5rem;
-  font-weight: 800;
+
+.analysis-card h2 {
+  font-size: 22px;
+  color: #0a4a75;
+  margin-bottom: 8px;
 }
-.result-body {
-  padding: 1.2rem 1.5rem 1.2rem 1.5rem;
+
+.card-header {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 4px;
+  margin-bottom: 12px;
 }
-.result-row {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  flex-wrap: wrap;
+
+.analysis-date {
+  font-size: 13px;
+  color: #777;
 }
-.result-label {
-  color: #888;
-  font-weight: 600;
-  min-width: 90px;
+
+.card-price {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #444;
 }
-.result-value {
-  background: #f1f3f6;
-  border-radius: 1rem;
-  padding: 0.3rem 0.9rem;
-  font-weight: 700;
-  color: #1976d2;
-  font-size: 1.08rem;
-  margin-left: 0.5rem;
+
+.core-insights, .levels, .candles-theories {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+  margin-bottom: 16px;
 }
-.result-badge {
-  display: inline-block;
-  padding: 0.3rem 1.1rem;
-  border-radius: 1.2rem;
-  font-weight: 800;
-  font-size: 1.1rem;
-  color: #fff;
-  background: #1976d2;
-  margin-right: 0.5rem;
+
+.confidence-score {
+  margin: 20px 0 12px;
 }
-.result-badge.buy { background: #43a047; }
-.result-badge.sell { background: #e53935; }
-.result-badge.hold { background: #bdbdbd; color: #333; }
-.result-confidence {
-  margin-top: 0.7rem;
-  background: #f1f3f6;
-  border-radius: 1rem;
-  padding: 0.5rem 1rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
+
 .confidence-bar {
-  flex: 1;
   height: 12px;
-  background: #e0e0e0;
+  background: #eee;
   border-radius: 6px;
   overflow: hidden;
+  margin-top: 6px;
   position: relative;
 }
-.confidence-bar-inner {
+
+.confidence-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #43a047 0%, #1976d2 100%);
+  background: linear-gradient(to left, #4caf50, #ffd633, #ff3c3c);
   border-radius: 6px;
-  transition: width 0.4s;
+  transition: width 0.3s ease;
 }
-.confidence-label {
-  font-weight: 700;
-  color: #1976d2;
-  min-width: 60px;
+
+.confidence-percent {
+  font-weight: bold;
+  font-size: 14px;
+  margin-top: 6px;
+  display: inline-block;
+  color: #0a4a75;
 }
-.actions {
-  margin-top: 1rem;
+
+.recommendation {
+  margin: 16px 0 10px;
+  font-size: 16px;
+}
+
+.recommendation-badge {
+  padding: 6px 16px;
+  border-radius: 8px;
+  background: #e8f5ff;
+  color: #0072b1;
+  font-weight: bold;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+.summary-section {
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 12px;
+}
+
+.summary-section h3 {
+  font-size: 17px;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.summary-section p {
+  margin: 0;
+  font-size: 15px;
+  color: #222;
+}
+
+.card-actions {
   display: flex;
-  gap: 1rem;
+  gap: 16px;
   justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
-.actions button {
-  background-color: #f1f1f1;
-  color: #333;
-  border: 1px solid #e0e0e0;
-  box-shadow: none;
+
+.card-actions button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  transition: background 0.3s ease;
 }
-.actions button:hover {
-  background-color: #e0e0e0;
-  color: #1976d2;
+
+.card-actions button:hover {
+  background: #0056b3;
+}
+
+/* استجابة للهاتف */
+@media (max-width: 600px) {
+  .core-insights, .levels, .candles-theories {
+    grid-template-columns: 1fr;
+  }
 }

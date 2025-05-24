@@ -1,8 +1,9 @@
 
-// 🔍 stockAnalyzer_unified.js – ملف موحد شامل للتحليل الفني الذكي مع دعم اسم السهم
+// 🔍 stockAnalyzer_unified.js – ملف موحد شامل للتحليل الفني الذكي المتقدم
 
 const { sql, poolPromise } = require("../data/db");
 
+// 📌 تحليل الشموع اليابانية داخل نفس الملف
 function detectCandlePattern(data) {
   if (!Array.isArray(data) || data.length < 2) return "لا يوجد نمط واضح";
 
@@ -17,10 +18,12 @@ function detectCandlePattern(data) {
   const upperShadow = high - Math.max(open, close);
   const lowerShadow = Math.min(open, close) - low;
 
+  // Hammer
   if (body < (high - low) * 0.3 && lowerShadow > body * 2 && upperShadow < body * 0.5) {
     return "شمعة المطرقة (Hammer) – إشارة انعكاس صعودي";
   }
 
+  // Bullish Engulfing
   const prevOpen = yesterday.OpenPrice;
   const prevClose = yesterday.ClosePrice;
   if (prevClose < prevOpen && close > open &&
@@ -34,17 +37,12 @@ function detectCandlePattern(data) {
 async function analyzeStock(symbol) {
   const pool = await poolPromise;
 
-  // 🏷️ احصل على اسم السهم
-  const nameResult = await pool.request()
-    .input("symbol", sql.NVarChar, symbol)
-    .query("SELECT Name FROM Watchlist WHERE Symbol = @symbol");
-  const name = nameResult.recordset[0]?.Name || "";
-
   const result = await pool.request()
     .input("symbol", sql.NVarChar, symbol)
     .query("SELECT TOP 90 * FROM PriceHistory WHERE Symbol = @symbol ORDER BY PriceDate DESC");
 
   const rows = result.recordset;
+
   if (!rows || rows.length < 30) {
     return { error: "لا توجد بيانات كافية للتحليل الفني." };
   }
@@ -62,22 +60,19 @@ async function analyzeStock(symbol) {
   const rsi = latest.RSI;
   const macd = latest.MACD;
 
-let trend = "جانبي";
-let trendSince = null;
-
-for (let i = 1; i < rows.length; i++) {
-  const p = rows[i];
-  if (p.EMA20 && p.EMA50 && p.EMA20 > p.EMA50 && p.ClosePrice > p.EMA20) {
-    trend = "صاعد";
-    trendSince = p.PriceDate;
-    break;
-  } else if (p.EMA20 && p.EMA50 && p.EMA20 < p.EMA50 && p.ClosePrice < p.EMA20) {
-    trend = "هابط";
-    trendSince = p.PriceDate;
-    break;
+  let trend = "جانبي", trendSince = dates[0];
+  for (let i = 1; i < rows.length; i++) {
+    const p = rows[i];
+    if (p.EMA20 && p.EMA50 && p.EMA20 > p.EMA50 && p.ClosePrice > p.EMA20) {
+      trend = "صاعد";
+      trendSince = p.PriceDate;
+      break;
+    } else if (p.EMA20 && p.EMA50 && p.EMA20 < p.EMA50 && p.ClosePrice < p.EMA20) {
+      trend = "هابط";
+      trendSince = p.PriceDate;
+      break;
+    }
   }
-}
-
 
   const emaCross = (rows[1]?.EMA20 < rows[1]?.EMA50 && ema20 > ema50) ? "Golden Cross" :
                    (rows[1]?.EMA20 > rows[1]?.EMA50 && ema20 < ema50) ? "Death Cross" : "لا يوجد";
@@ -105,8 +100,8 @@ for (let i = 1; i < rows.length; i++) {
   }).sort((a, b) => a - b).slice(0, 3);
 
   const candleSignal = detectCandlePattern(rows.slice(-2));
-  const elliottWave = "موجة 3 - صاعدة";
-  const wyckoffPhase = "Accumulation";
+  const elliottWave = "موجة 3 - صاعدة";  // placeholder
+  const wyckoffPhase = "Accumulation";  // placeholder
 
   let score = 0;
   if (trend === "صاعد") score += 15;
@@ -126,8 +121,7 @@ for (let i = 1; i < rows.length; i++) {
     "❌ غير مناسب حاليًا";
 
   const narrativeSummary = `
-📌 السهم ${symbol}${name ? ' - ' + name : ''} في اتجاه ${trend} منذ ${trendSince ? "منذ " + new Date(trendSince).toLocaleDateString("ar-EG") : ""}
-.
+📌 السهم ${symbol} في اتجاه ${trend} منذ ${new Date(trendSince).toLocaleDateString("ar-EG")}.
 تظهر تقاطع ${emaCross}، وزخم ${momentumSignal}، مع إشارات شموع: ${candleSignal}.
 السعر قريب من دعم عند ${supportLevels[0]?.toFixed(2)} ومقاومة عند ${resistanceLevels[0]?.toFixed(2)}.
 ${wyckoffPhase === "Accumulation" ? "تحليل وايكوف يشير إلى بداية مرحلة تجميع." : ""}
@@ -137,7 +131,6 @@ ${elliottWave.includes("3") ? "ويظهر ضمن موجة 3 من نظرية إل
 
   return {
     symbol,
-    name,
     lastPrice,
     trend,
     trendSince,
