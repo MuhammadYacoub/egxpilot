@@ -56,7 +56,7 @@ button, .button {
   outline: none;
   letter-spacing: 0.5px;
   transition: background 0.2s, box-shadow 0.2s, color 0.2s, border 0.2s;
-  padding: 0.8rem 1.6rem;
+  padding: 0.6rem 1.3rem;
   min-width: 100px;
 }
 button:hover, button:focus, .button:hover, .button:focus {
